@@ -1,7 +1,11 @@
 const express = require("express");
+const morgan = require("morgan");
 const server = express();
 const PORT = process.env.PORT || 3000;
 const { apiRouter } = require("./routes");
+const { client } = require("./db/init_db.js");
+
+server.use(morgan("dev"));
 
 server.use("/api", apiRouter);
 
@@ -12,10 +16,11 @@ server.use((req, res, next) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
+  console.log(`listening on port ${PORT}`);
   try {
-    console.log(`listening on port ${PORT}`);
+    await client.connect();
   } catch (err) {
-    console.log(`todo/index.js 12: ${err}`);
+    console.log(`todo/index.js 21: ${err}`);
   }
 });
