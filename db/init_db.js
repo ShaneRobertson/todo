@@ -18,7 +18,7 @@ async function buildDB() {
     `);
 
     console.log(`Building tables...`);
-    console.log(`upcoming`);
+    console.log(`upcoming...`);
 
     await client.query(`
             CREATE TABLE upcoming (
