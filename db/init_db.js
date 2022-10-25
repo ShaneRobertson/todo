@@ -1,55 +1,47 @@
-require("dotenv").config();
-
-const { Client } = require("pg");
-const { KEY, PASSWORD } = process.env;
-const DB_NAME = `${KEY}:${PASSWORD}@localhost:5432/todo`;
-const DB_URL = process.env.DATABASE_URL || `postgressql://${DB_NAME}`;
-const client = new Client(DB_URL);
-
-module.exports = { client };
+const { client, db_createTodo, db_createCustomer } = require("./index.js");
 
 async function buildDB() {
   try {
     client.connect();
     console.log("Dropping Tables...");
-    await client.query(`
-    DROP TABLE IF EXISTS expired, upcoming, clients CASCADE;
 
+    await client.query(`
+    DROP TABLE IF EXISTS todos CASCADE;
+    DROP TABLE IF EXISTS customers CASCADE;
+    DROP TABLE IF EXISTS customers_todos;
     `);
 
     console.log(`Building tables...`);
-    console.log(`upcoming...`);
+    console.log("customers...");
 
     await client.query(`
-            CREATE TABLE upcoming (
-                upcoming_id SERIAL PRIMARY KEY,
-                title VARCHAR(75) NOT NULL,
-                description VARCHAR(250),
-                due_date DATE NOT NULL
-            );
-        `);
-    console.log("expired...");
-    await client.query(`
-            CREATE TABLE expired (
-                expired_id SERIAL PRIMARY KEY,
-                title VARCHAR(75) NOT NULL,
-                description VARCHAR(250),
-                due_date DATE NOT NULL
-            );
-
-        `);
-    console.log("clients...");
-
-    await client.query(`
-    CREATE TABLE clients (
-        client_id SERIAL PRIMARY KEY,
+    CREATE TABLE customers (
+        customer_id SERIAL PRIMARY KEY,
         username VARCHAR(75) NOT NULL UNIQUE,
-        password VARCHAR(250) NOT NULL,
-        upcoming_id INT REFERENCES upcoming(upcoming_id),
-        expired_id INT REFERENCES expired(expired_id)
+        password VARCHAR(250) NOT NULL
     );
 
 `);
+
+    console.log(`todos...`);
+    await client.query(`
+            CREATE TABLE todos (
+                todo_id SERIAL PRIMARY KEY,
+                title VARCHAR(75) NOT NULL,
+                description VARCHAR(250),
+                due_date DATE NOT NULL,
+                is_complete BOOLEAN DEFAULT FALSE,
+                customer_id INT REFERENCES customers(customer_id)
+            );
+        `);
+
+    console.log("customer_todo..");
+    await client.query(`
+              CREATE TABLE customers_todos(
+                customer_id INT UNIQUE,
+                todo_id INT
+              );
+    `);
 
     console.log("Finished creating tables...");
   } catch (err) {
@@ -57,19 +49,70 @@ async function buildDB() {
   }
 }
 
-// async function populateInitialData() {
-//   try {
-//     await client.query(`
-//         INSERT INTO upcoming(title, description, due_date)
-//         VALUES ('upcoming1', 'This is upcoming1s description', '2022-12-31'),
-//         ('upcoming2', 'This is upcoming2s description', '2022-11-23');
-//         `);
-//   } catch (err) {
-//     console.log("err in populateInitialData: ", err);
-//   }
-// }
+// Sample Data =================
+let newTodo1 = {
+  title: "todo1",
+  description: "This is todo1s description",
+  due_date: "2022-11-15",
+  customer_id: 1,
+};
+
+let newTodo2 = {
+  title: "todo2",
+  description: "This is todo2s description",
+  due_date: "2021-07-02",
+  customer_id: 1,
+};
+
+let newTodo3 = {
+  title: "todo3",
+  description: "This is todo3s description",
+  due_date: "2022-12-3",
+  customer_id: 1,
+};
+
+let newTodo4 = {
+  title: "todo4",
+  description: "This is todo4s description",
+  due_date: "2023-12-31",
+  customer_id: 1,
+};
+
+let newTodo5 = {
+  title: "todo5",
+  description: "This is todo5s description",
+  due_date: "2022-05-22",
+  customer_id: 1,
+};
+
+let newTodo6 = {
+  title: "todo6",
+  description: "This is todo6s description",
+  due_date: "2022-08-01",
+  customer_id: 1,
+};
+
+let customer1 = {
+  username: "zelda",
+  password: "Hyrule",
+};
+// =============================
+
+async function populateInitialData() {
+  try {
+    await db_createCustomer(customer1);
+    await db_createTodo(newTodo1);
+    await db_createTodo(newTodo2);
+    await db_createTodo(newTodo3);
+    await db_createTodo(newTodo4);
+    await db_createTodo(newTodo5);
+    await db_createTodo(newTodo6);
+  } catch (err) {
+    console.log("err in populateInitialData: ", err);
+  }
+}
 
 buildDB()
-  .then(console.log("dff"))
+  .then(populateInitialData)
   .catch(console.error)
   .finally(() => client.end());

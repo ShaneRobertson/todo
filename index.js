@@ -3,7 +3,7 @@ const morgan = require("morgan");
 const server = express();
 const PORT = process.env.PORT || 3000;
 const { apiRouter } = require("./routes");
-const { client } = require("./db/init_db.js");
+const { client } = require("./db/index.js");
 
 server.use(morgan("dev"));
 
