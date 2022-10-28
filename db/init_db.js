@@ -51,42 +51,42 @@ async function buildDB() {
 
 // Sample Data =================
 let newTodo1 = {
-  title: "todo1",
+  title: "Take out the garbage",
   description: "This is todo1s description",
   due_date: "2022-11-15",
   customer_id: 1,
 };
 
 let newTodo2 = {
-  title: "todo2",
+  title: "Study React",
   description: "This is todo2s description",
   due_date: "2021-07-02",
   customer_id: 1,
 };
 
 let newTodo3 = {
-  title: "todo3",
+  title: "Follow Noahs advice",
   description: "This is todo3s description",
   due_date: "2022-12-3",
   customer_id: 1,
 };
 
 let newTodo4 = {
-  title: "todo4",
+  title: "type this title",
   description: "This is todo4s description",
   due_date: "2023-12-31",
   customer_id: 1,
 };
 
 let newTodo5 = {
-  title: "todo5",
+  title: "Find a new house",
   description: "This is todo5s description",
   due_date: "2022-05-22",
   customer_id: 1,
 };
 
 let newTodo6 = {
-  title: "todo6",
+  title: "Save Hyrule from Gananondorf",
   description: "This is todo6s description",
   due_date: "2022-08-01",
   customer_id: 1,
