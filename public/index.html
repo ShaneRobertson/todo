@@ -34,14 +34,30 @@
           </div>
         </div>
       </div>
-      <!-- Todo output area -->
-      <div id="todo-output">
-        <div class="expired-todo-container">
-          <span>Expired</span>
-          <div class="expired-todo"></div>
+      <div id="main-container">
+        <div id="create-todo">
+          <form action="#">
+            <label>Date</label>
+            <input id="create-todo-date" type="date" /> <br />
+            <label>Title</label>
+            <input id="create-todo-title" type="text" />
+            <label>description</label>
+            <input id="create-todo-description" type="textarea" />
+            <button id="create-todo-btn">Create</button>
+          </form>
         </div>
-        <div class="upcoming-todo-container"></div>
-        <div class="completed-todo-container"></div>
+        <!-- Todo output area -->
+        <div id="todo-output">
+          <div class="current-todo-container">
+            <span>Current</span>
+          </div>
+          <div class="expired-todo-container">
+            <span>Expired</span>
+          </div>
+          <div class="completed-todo-container">
+            <span>Completed</span>
+          </div>
+        </div>
       </div>
     </main>
   </body>

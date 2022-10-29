@@ -18,8 +18,12 @@
   --todo-cards: #fc4a1a;
 }
 
-/* Styling Sections
-    -- signin styling --
+/* Styling sections
+    -- Nav --
+    -- Signin --
+    -- Main Todo Container --
+    -- Todo Output Area --
+    -- Todo Cards --
 */
 
 /* -- nav styling -- */
@@ -96,16 +100,39 @@
   right: 1rem;
 }
 
-/* -- todo cards -- */
+/* -- Main Todo Container -- */
+#main-container {
+  display: grid;
+  grid-template-columns: 1fr 5fr;
+  grid-template-rows: 1fr;
+}
+
+/* -- Todo Output Area -- */
 
 #todo-output {
-  display: flex;
-  flex-flow: wrap;
-  justify-content: center;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(3fr);
   background-color: #f78733;
   height: 90vh;
 }
+
+.current-todo-container {
+  height: 10rem;
+  background-color: green;
+}
+
+.expired-todo-container {
+  height: 10rem;
+  background-color: blue;
+}
+.completed-todo-container {
+  height: 10rem;
+  background-color: gray;
+}
+
+/* -- todo cards -- */
+
 .todo-card {
   margin: 1rem;
   padding: 0.5rem;
@@ -149,18 +176,15 @@
   box-shadow: -2px 2px 5px black;
   margin-right: 0.3rem;
 }
-/* .expired {
-  border: 2px solid red;
-  box-shadow: 3px 3px 5px red;
-}
-
-.upcoming {
-  border: 2px solid yellow;
-  box-shadow: 3px 3px 5px yellow;
-} */
 
 #date-indicator-inner {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+/* -- Create Todo -- */
+#create-todo {
+  grid-column: 1 /2;
+  grid-row: 1 / 4;
 }

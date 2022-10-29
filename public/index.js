@@ -5,7 +5,11 @@ const signInModalContainer = document.querySelector("#signin-modal-container");
 const signInModalDetails = document.querySelector("#signin-modal-details");
 const signInModalCancelBtn = document.querySelector("#signin-modal-cancel-btn");
 const todoOutputArea = document.querySelector("#todo-output");
-console.log(todoOutputArea);
+const currentTodoContainer = document.getElementById("current-todo-container");
+const expiredTodoContainer = document.getElementById("expire-todo-container");
+const completedTodoContainer = document.getElementById(
+  "completedTodoContainer"
+);
 const date = new Date();
 const year = date.toLocaleString("default", { year: "numeric" });
 const month = date.toLocaleString("default", { month: "2-digit" });
@@ -18,27 +22,26 @@ const getTodos = async () => {
     const result = await fetch("/api/todos");
     const todos = await result.json();
     todos.reverse().forEach((element) => {
-      todoOutputArea.insertAdjacentHTML(
-        "beforeend",
-        `<div class='todo-card ${
-          element.due_date.slice(0, element.due_date.indexOf("T")) > currentDate
-            ? "expired"
-            : "upcoming"
-        }'>
+      let endOfDate = element.due_date.indexOf("T");
+      if (element.due_date.slice(0, endOfDate) > currentDate) {
+        todoOutputArea.insertAdjacentHTML(
+          "beforeend",
+          `<div class='todo-card ${
+            element.due_date.slice(0, endOfDate) > currentDate
+              ? "expired"
+              : "upcoming"
+          }'>
               <div id='todo-card-header-container'>
                   <div id='todo-card-date-indicator-outer'>
                       <div id='date-indicator-inner'>
                         <div id='due-date-indicator-${
-                          element.due_date.slice(
-                            0,
-                            element.due_date.indexOf("T")
-                          ) > currentDate
+                          element.due_date.slice(0, endOfDate) > currentDate
                             ? "upcoming"
                             : "expired"
                         }'></div>
                         <span id='todo-date'>Due: ${element.due_date.slice(
                           0,
-                          element.due_date.indexOf("T")
+                          endOfDate
                         )}</span>
                       </div>
                   </div>  
@@ -54,9 +57,10 @@ const getTodos = async () => {
                     <p id='todo-description'>${element.description}</p>
             </div>
         `
-      );
+        );
+      }
     });
-    return todos;
+    // return todos;
   } catch (err) {
     console.log("getTodos: ", err);
   }
