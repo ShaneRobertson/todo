@@ -104,9 +104,9 @@ async function populateInitialData() {
     await db_createTodo(newTodo1);
     await db_createTodo(newTodo2);
     await db_createTodo(newTodo3);
-    await db_createTodo(newTodo4);
-    await db_createTodo(newTodo5);
-    await db_createTodo(newTodo6);
+    // await db_createTodo(newTodo4);
+    // await db_createTodo(newTodo5);
+    // await db_createTodo(newTodo6);
   } catch (err) {
     console.log("err in populateInitialData: ", err);
   }
