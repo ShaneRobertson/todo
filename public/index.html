@@ -8,7 +8,7 @@
 
     <link rel="stylesheet" href="style.css" />
 
-    <title>Document</title>
+    <title>Todo App</title>
   </head>
   <body>
     <header>
@@ -35,7 +35,7 @@
         </div>
       </div>
       <div id="main-container">
-        <div id="create-todo">
+        <div id="create-todo-form">
           <form action="#">
             <label>Date</label>
             <input id="create-todo-date" type="date" /> <br />
@@ -48,14 +48,17 @@
         </div>
         <!-- Todo output area -->
         <div id="todo-output">
-          <div class="current-todo-container">
-            <span>Current</span>
+          <div id="current-todo-outer-container">
+            <span id="row-header">Current</span>
+            <div id="current-todo-inner-container"></div>
           </div>
-          <div class="expired-todo-container">
-            <span>Expired</span>
+          <div id="expired-todo-outer-container">
+            <span id="row-header">Expired</span>
+            <div id="expired-todo-inner-container"></div>
           </div>
-          <div class="completed-todo-container">
-            <span>Completed</span>
+          <div id="completed-todo-outer-container">
+            <span id="row-header">Completed</span>
+            <div id="completed-todo-inner-container"></div>
           </div>
         </div>
       </div>

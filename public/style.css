@@ -72,7 +72,6 @@
 
 #signin-modal-overlay {
   display: none;
-
   position: absolute;
   right: 0;
   top: 0;
@@ -113,33 +112,70 @@
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(3fr);
-  background-color: #f78733;
+  background-color: red;
   height: 90vh;
 }
 
-.current-todo-container {
-  height: 10rem;
-  background-color: green;
+#current-todo-outer-container {
+  display: grid;
+  grid-template-columns: minmax(3rem, 4rem) 8fr;
+  text-align: center;
 }
 
-.expired-todo-container {
-  height: 10rem;
+#current-todo-inner-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30vh;
+  background-color: green;
+  overflow: auto;
+}
+
+#row-header {
+  display: inline-block;
+  line-height: 30vh;
+  transform: rotate(-60deg);
+  opacity: 0.3;
+}
+
+#expired-todo-inner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30vh;
   background-color: blue;
 }
-.completed-todo-container {
-  height: 10rem;
+
+#expired-todo-outer-container {
+  display: grid;
+  grid-template-columns: 1fr 8fr;
+}
+#completed-todo-inner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30vh;
   background-color: gray;
+}
+
+#completed-todo-outer-container {
+  display: grid;
+  grid-template-columns: 1fr 8fr;
+  padding-left: 4rem;
 }
 
 /* -- todo cards -- */
 
 .todo-card {
+  display: inline-block;
   margin: 1rem;
   padding: 0.5rem;
   background-color: var(--background-todo);
   border-radius: 0.5rem;
   box-shadow: -2px 2px 5px black;
   min-width: 15rem;
+  max-width: 25rem;
 }
 
 #todo-date {
@@ -184,7 +220,7 @@
 }
 
 /* -- Create Todo -- */
-#create-todo {
+#create-todo-form {
   grid-column: 1 /2;
   grid-row: 1 / 4;
 }

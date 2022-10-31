@@ -81,14 +81,14 @@ let newTodo4 = {
 let newTodo5 = {
   title: "Find a new house",
   description: "This is todo5s description",
-  due_date: "2022-05-22",
+  due_date: "2023-05-22",
   customer_id: 1,
 };
 
 let newTodo6 = {
   title: "Save Hyrule from Gananondorf",
   description: "This is todo6s description",
-  due_date: "2022-08-01",
+  due_date: "2023-08-01",
   customer_id: 1,
 };
 
@@ -104,9 +104,9 @@ async function populateInitialData() {
     await db_createTodo(newTodo1);
     await db_createTodo(newTodo2);
     await db_createTodo(newTodo3);
-    // await db_createTodo(newTodo4);
-    // await db_createTodo(newTodo5);
-    // await db_createTodo(newTodo6);
+    await db_createTodo(newTodo4);
+    await db_createTodo(newTodo5);
+    await db_createTodo(newTodo6);
   } catch (err) {
     console.log("err in populateInitialData: ", err);
   }
