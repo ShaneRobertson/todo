@@ -5,12 +5,12 @@ const DB_URL = process.env.DATABASE_URL || `postgressql://${DB_NAME}`;
 const client = new Client(DB_URL);
 
 // Seeding the database ==========
-const db_createCustomer = async ({ username, password }) => {
+const db_createUser = async ({ username, password }) => {
   "";
   try {
     await client.query(
       `
-            INSERT INTO customers(username, password)
+            INSERT INTO users(username, password)
             VALUES ($1, $2)
             `,
       [username, password]
@@ -19,15 +19,41 @@ const db_createCustomer = async ({ username, password }) => {
     console.log("error in db_createCustomer: ", err);
   }
 };
-const db_createTodo = async ({ title, description, due_date, customer_id }) => {
+
+// const db_createTodoRelation = async (user_id, todo_id) => {
+//   try {
+//     const { rows } = await client.query(
+//       `
+//       INSERT INTO users_todos(user_id, todo_id)
+//       VALUES($1, $2) RETURNING*;
+//     `,
+//       [user_id, todo_id]
+//     );
+//     console.log("relationship: ", rows);
+//   } catch (err) {
+//     console.log("Error with db_createTodoRelation: ", err);
+//   }
+// };
+const db_createTodo = async ({ title, description, due_date, user_id }) => {
   try {
-    await client.query(
+    // const {
+    //   rows: [{ todo_id }],
+    // } = await client.query(
+    //   `
+    //     INSERT INTO todos(title, description, due_date,  user_id)
+    //     VALUES ($1, $2, $3, $4) RETURNING *;
+    //     `,
+    //   [title, description, due_date, user_id]
+    // );
+    // await db_createTodoRelation(user_id, todo_id);
+    const { rows } = await client.query(
       `
-        INSERT INTO todos(title, description, due_date,  customer_id)
-        VALUES ($1, $2, $3, $4) 
+        INSERT INTO todos(title, description, due_date,  user_id)
+        VALUES ($1, $2, $3, $4) RETURNING *;
         `,
-      [title, description, due_date, customer_id]
+      [title, description, due_date, user_id]
     );
+    console.log(rows);
   } catch (err) {
     console.log("db_createTodo err: ", err);
   }
@@ -35,16 +61,43 @@ const db_createTodo = async ({ title, description, due_date, customer_id }) => {
 
 // Getting the todos ================
 
-const getTodos = async () => {
+const db_getTodos = async (user_id) => {
   try {
-    const { rows } = await client.query(`
-      SELECT * FROM todos;
-    `);
-    console.log("result is: ", rows);
+    const { rows } = await client.query(
+      `
+      SELECT * FROM todos
+      WHERE user_id=$1
+      ;
+    `,
+      [user_id]
+    );
+    console.log("result of get todos: ", rows);
     return rows;
   } catch (err) {
     console.log("getTodos: ", err);
   }
 };
 
-module.exports = { client, db_createCustomer, db_createTodo, getTodos };
+// Delete Todos ==============
+
+const db_deleteTodo = async (todo_id) => {
+  try {
+    await client.query(
+      `
+      DELETE FROM todos
+      WHERE todo_id=$1
+    `,
+      [todo_id]
+    );
+  } catch (err) {
+    console.log("error in db_deleteTodo: ", err);
+  }
+};
+
+module.exports = {
+  client,
+  db_createUser,
+  db_createTodo,
+  db_getTodos,
+  db_deleteTodo,
+};

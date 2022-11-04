@@ -6,7 +6,8 @@ const { apiRouter } = require("./routes");
 const { client } = require("./db/index.js");
 
 server.use(morgan("dev"));
-
+server.use(express.json());
+server.use(express.urlencoded({ extended: false }));
 server.use("/api", apiRouter);
 
 const path = require("path");
