@@ -34,18 +34,9 @@ const db_createUser = async ({ username, password }) => {
 //     console.log("Error with db_createTodoRelation: ", err);
 //   }
 // };
+
 const db_createTodo = async ({ title, description, due_date, user_id }) => {
   try {
-    // const {
-    //   rows: [{ todo_id }],
-    // } = await client.query(
-    //   `
-    //     INSERT INTO todos(title, description, due_date,  user_id)
-    //     VALUES ($1, $2, $3, $4) RETURNING *;
-    //     `,
-    //   [title, description, due_date, user_id]
-    // );
-    // await db_createTodoRelation(user_id, todo_id);
     const { rows } = await client.query(
       `
         INSERT INTO todos(title, description, due_date,  user_id)
@@ -59,7 +50,7 @@ const db_createTodo = async ({ title, description, due_date, user_id }) => {
   }
 };
 
-// Getting the todos ================
+// ============== Get todos ================
 
 const db_getTodos = async (user_id) => {
   try {
@@ -78,8 +69,7 @@ const db_getTodos = async (user_id) => {
   }
 };
 
-// Delete Todos ==============
-
+// ============= Delete Todos ==============
 const db_deleteTodo = async (todo_id) => {
   try {
     await client.query(
@@ -94,10 +84,39 @@ const db_deleteTodo = async (todo_id) => {
   }
 };
 
+// ============== Update Todo ==========================
+
+const db_updateTodo = async (todo_id, fields = {}) => {
+  console.log("db_updateTodo is_complete fields: ", fields);
+  const setString = Object.keys(fields)
+    .map((key, index) => `"${key}"=$${index + 1}`)
+    .join(", ");
+  console.log("this is the setString: ", setString);
+  // update todo table
+  try {
+    // update any fields that need to be updated
+    if (setString.length > 0) {
+      const { rows } = await client.query(
+        `
+          UPDATE todos
+          SET ${setString}
+          WHERE todo_id=${todo_id}
+          RETURNING *;
+        `,
+        Object.values(fields)
+      );
+      console.log("rows after update in DB: ", rows);
+      return rows;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
 module.exports = {
   client,
   db_createUser,
   db_createTodo,
   db_getTodos,
   db_deleteTodo,
+  db_updateTodo,
 };

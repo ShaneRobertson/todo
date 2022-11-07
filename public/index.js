@@ -22,10 +22,11 @@ const currentDate = `${year}-${month}-${day}`;
 
 // Functions ========================================
 const getTodos = async (user_id) => {
-  console.log(user_id);
+  // console.log(user_id);
   currentTodoContainer.innerHTML = "";
   expiredTodoContainer.innerHTML = "";
   completedTodoContainer.innerHTML = "";
+
   try {
     const result = await fetch("/api/todos", {
       method: "POST",
@@ -70,11 +71,18 @@ const getTodos = async (user_id) => {
                             </div>
                         </div>  
 
+                    
                         <div id='todo-card-controls'>
-                          <div class='todo-card-btns delete' data-delete>&#10006;</div>
-                          <div class='todo-card-btns complete' data-complete>&#10004;</div>
-                          <div class='todo-card-btns edit' data-edit>&#9998;</div>
-                        </div>
+                        <div class='todo-card-btns delete' data-action='delete' data-id=${
+                          element.todo_id
+                        }>&#10006;</div>
+                        <div class='todo-card-btns complete' data-action='complete' data-id=${
+                          element.todo_id
+                        }>&#10004;</div>
+                        <div class='todo-card-btns edit' data-action='edit' data-id=${
+                          element.todo_id
+                        }>&#9998;</div>
+                      </div>
                               
                   </div>
                     <h3>${element.title}</h3>
@@ -132,21 +140,41 @@ const getTodos = async (user_id) => {
   }
 };
 
-const deleteTodo = async (todo_id, user_id) => {
+const deleteTodo = async (todo_id) => {
   try {
-    await fetch("/api/todo/delete", {
+    await fetch("/api/delete", {
       method: "DELETE",
       headers: {
         "content-type": "application/json",
       },
       body: JSON.stringify({ todo_id }),
     });
-    // const outcome = await result.json();
 
-    await getTodos(user_id);
+    // HARDCODED USER ID HERE =========================
+
     // console.log("outcome is: ", outcome);
   } catch (err) {
     console.log("error in deleteTodo Function: ", err);
+  }
+};
+
+const updateTodo = async (todo_id) => {
+  try {
+    const result = await fetch("/api/complete", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        todo_id,
+      }),
+    });
+
+    const updatedTodo = await result.json();
+    // await getTodos(2);
+    console.log("updated todo is: ", updatedTodo);
+  } catch (err) {
+    console.log("updateTodo Error: ", err);
   }
 };
 // const sortTodos = (todoArray) => {
@@ -167,14 +195,24 @@ signInModalCancelBtn.addEventListener("click", () => {
 });
 
 todoOutputArea.addEventListener("click", async (e) => {
-  console.log(e.target.dataset.action == "complete");
-  if (e.target.dataset.action == "delete") {
-    let todoId = e.target.dataset.id;
-    const result = await deleteTodo(todoId);
-    console.log("flag: ", result);
-    await getTodos(2);
-  }
+  console.log("parent listener: ", todoOutputArea);
   try {
+    if (e.target.dataset.action == "delete") {
+      console.log("delete listener");
+      let todoId = e.target.dataset.id;
+      const result = await deleteTodo(todoId);
+      // console.log("flag: ", result);
+      await getTodos(2);
+    }
+    if (e.target.dataset.action == "complete") {
+      console.log("complete lisener");
+      let todoId = e.target.dataset.id;
+      console.log(todoId);
+      const result = await updateTodo(todoId);
+      console.log("flag: ", result);
+      const todosAfterComplete = await getTodos(2);
+      console.log("💡💡💡💡💡💡", todosAfterComplete);
+    }
   } catch (err) {
     console.log("Error in delete deleteTodo listener =>", err);
   }

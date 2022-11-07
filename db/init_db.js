@@ -38,7 +38,7 @@ async function buildDB() {
     console.log("customer_todo..");
     await client.query(`
               CREATE TABLE users_todos(
-                user_id INT,
+                user_id INT, 
                 todo_id INT
               );
     `);
@@ -55,6 +55,7 @@ let newTodo1 = {
   description: "This is todo1s description",
   due_date: "2022-11-15",
   user_id: 1,
+  is_complete: true,
 };
 
 let newTodo2 = {
@@ -90,6 +91,7 @@ let newTodo6 = {
   description: "This is todo6s description",
   due_date: "2022-08-01",
   user_id: 2,
+  is_complete: true,
 };
 
 let user1 = {
