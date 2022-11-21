@@ -96,7 +96,7 @@ let newTodo6 = {
 
 let user1 = {
   username: "zelda",
-  password: "Hyrule",
+  password: "hyrule",
 };
 let user2 = {
   username: "link",

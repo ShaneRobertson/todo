@@ -1,15 +1,36 @@
 const apiRouter = require("express").Router();
-const { db_getTodos, db_deleteTodo, db_updateTodo } = require("../db/index");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+const {
+  db_getTodos,
+  db_deleteTodo,
+  db_updateTodo,
+  db_getUser,
+} = require("../db/index");
 
 apiRouter.get("/", (req, res) => {
   res.send("hello there!");
 });
 
-apiRouter.get("/user", (req, res) => {
+apiRouter.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+  console.log("username in routes: ", username);
   try {
-    res.send("in user route");
-  } catch (err) {
-    console.log(`err is: ${err}`);
+    const response = await db_getUser(username, password);
+    if (!response)
+      res.send({ message: "Username or password invalid. Please try again." });
+    let verifiedUser = {};
+    for (const key in response) {
+      if (key != "password") {
+        verifiedUser[key] = response[key];
+      }
+    }
+    jwt.sign({ verifiedUser }, process.env.jwt_Secret, (err, token) => {
+      if (err) res.send({ err, status: 403 });
+      res.send({ verifiedUser, token });
+    });
+  } catch (error) {
+    console.log("/login in routes: ", error.message);
   }
 });
 
