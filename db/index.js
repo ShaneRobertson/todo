@@ -20,20 +20,26 @@ const db_createUser = async ({ username, password }) => {
   }
 };
 
-// const db_createTodoRelation = async (user_id, todo_id) => {
-//   try {
-//     const { rows } = await client.query(
-//       `
-//       INSERT INTO users_todos(user_id, todo_id)
-//       VALUES($1, $2) RETURNING*;
-//     `,
-//       [user_id, todo_id]
-//     );
-//     console.log("relationship: ", rows);
-//   } catch (err) {
-//     console.log("Error with db_createTodoRelation: ", err);
-//   }
-// };
+const db_getUser = async (username, db_password) => {
+  console.log("username in db: ", username);
+  try {
+    const {
+      rows: [row],
+    } = await client.query(
+      `
+      SELECT * FROM users
+      WHERE username=$1
+    `,
+      [username]
+    );
+    console.log("result in the db: ", row);
+    if (db_password != row.password) return;
+
+    return row;
+  } catch (err) {
+    console.log("Error in db_getUser: ", err);
+  }
+};
 
 const db_createTodo = async ({ title, description, due_date, user_id }) => {
   try {
@@ -119,4 +125,5 @@ module.exports = {
   db_getTodos,
   db_deleteTodo,
   db_updateTodo,
+  db_getUser,
 };

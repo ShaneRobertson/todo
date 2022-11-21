@@ -1,5 +1,6 @@
 // Dom Elements ========================
-const signInBtn = document.querySelector(".nav-signin-btn");
+const openSignInModal = document.getElementById("nav-signin-btn");
+const closeSignInModal = document.getElementById("siginin-modal-close");
 const signInModalOverlay = document.getElementById("signin-modal-overlay");
 const signInModalContainer = document.querySelector("#signin-modal-container");
 const signInModalDetails = document.querySelector("#signin-modal-details");
@@ -14,6 +15,10 @@ const expiredTodoContainer = document.getElementById(
 const completedTodoContainer = document.getElementById(
   "completed-todo-inner-container"
 );
+const signinUsername = document.getElementById("floatingUsername");
+const signinPassword = document.getElementById("floatingPassword");
+const signinBtn = document.getElementById("signin-modal-submit");
+
 const date = new Date();
 const year = date.toLocaleString("default", { year: "numeric" });
 const month = date.toLocaleString("default", { month: "2-digit" });
@@ -37,9 +42,8 @@ const getTodos = async (user_id) => {
     });
 
     const todos = await result.json();
-    console.log("result is: ", todos);
+
     todos.reverse().forEach((element) => {
-      // console.log(element.todo_id);
       let endOfDate = element.due_date.indexOf("T");
       let currentOrExpired =
         element.due_date.slice(0, endOfDate) > currentDate
@@ -47,7 +51,6 @@ const getTodos = async (user_id) => {
           : expiredTodoContainer;
 
       if (element.is_complete) {
-        // completedTodoContainer.innerHTML = "";
         completedTodoContainer.insertAdjacentHTML(
           "beforeend",
           `<div class='todo-card ${
@@ -91,7 +94,6 @@ const getTodos = async (user_id) => {
         `
         );
       } else {
-        // currentOrExpired.innerHTML = "";
         currentOrExpired.insertAdjacentHTML(
           "beforeend",
           `<div class='todo-card ${
@@ -134,7 +136,6 @@ const getTodos = async (user_id) => {
         );
       }
     });
-    // return todos;
   } catch (err) {
     console.log("getTodos: ", err);
   }
@@ -177,21 +178,55 @@ const updateTodo = async (todo_id) => {
     console.log("updateTodo Error: ", err);
   }
 };
-// const sortTodos = (todoArray) => {
-//   let upcoming = [];
-//   let expired = [];
-//   let completed = [];
-// };
-// sortTodos([1, 2, 3]);
+
+const loginUser = async (username, password) => {
+  try {
+    const result = await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+    });
+    console.log("result in public is: ", result);
+    const userObj = await result.json();
+    console.log("userObj in public: ", userObj);
+    return userObj;
+  } catch (err) {
+    console.log("Error in loginUser: ", err);
+  }
+};
 
 // Event Listeners ====================================
-
-signInBtn.addEventListener("click", function () {
+openSignInModal.addEventListener("click", () => {
   signInModalOverlay.style.display = "block";
 });
 
-signInModalCancelBtn.addEventListener("click", () => {
+closeSignInModal.addEventListener("click", () => {
+  signinUsername.value = "";
+  signinPassword.value = "";
   signInModalOverlay.style.display = "none";
+});
+
+signinBtn.addEventListener("click", async (e) => {
+  e.preventDefault();
+  const username = signinUsername.value;
+  const password = signinPassword.value;
+  try {
+    const userObj = await loginUser(username, password);
+    console.log("userObj front end is: ", userObj);
+    if (userObj.message) return userObj.message;
+    signInModalOverlay.style.display = "none";
+  } catch (err) {
+    console.log("Error in login user: ", err);
+  }
+
+  console.log("username is: ", username, "password is: ", password);
+  signinUsername.value = "";
+  signinPassword.value = "";
 });
 
 todoOutputArea.addEventListener("click", async (e) => {
