@@ -25,26 +25,53 @@
           </div>
           <ul class="nav-controls">
             <li>Guest</li>
-            <li id='nav-signin-btn'>Sign In</button>
+            <li id="nav-signin-btn">Sign In</li>
           </ul>
         </div>
       </nav>
     </header>
     <main>
+      <!-- Sign in modal -->
       <div id="signin-modal-overlay">
         <div id="signin-modal-container">
           <div class="form-floating mb-3">
-            <input type="text" class="form-control" id="floatingUsername" placeholder="Username">
+            <input
+              type="text"
+              class="form-control"
+              id="floatingUsername"
+              placeholder="Username"
+            />
             <label for="floatingUsername">Username</label>
           </div>
+
           <div class="form-floating">
-            <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+            <input
+              type="password"
+              class="form-control"
+              id="floatingPassword"
+              placeholder="Password"
+            />
             <label for="floatingPassword">Password</label>
           </div>
-          <button type="button" class="btn btn-secondary" id="siginin-modal-close">close</button>
-          <button type="button" class="btn btn-primary" id="signin-modal-submit">submit</button>
+          <div id="signin-modal-btns-container">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              id="siginin-modal-close"
+            >
+              close
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="signin-modal-submit"
+            >
+              submit
+            </button>
+          </div>
         </div>
       </div>
+      <!-- Create new todo -->
       <div id="main-container">
         <div id="create-todo-form">
           <form action="#">

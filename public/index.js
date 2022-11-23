@@ -200,6 +200,12 @@ const loginUser = async (username, password) => {
   }
 };
 
+const clearSignInError = () => {
+  const errMessage = document.getElementById("signin-error");
+  if (errMessage) {
+    errMessage.innerText = "";
+  }
+};
 // Event Listeners ====================================
 openSignInModal.addEventListener("click", () => {
   signInModalOverlay.style.display = "block";
@@ -209,16 +215,27 @@ closeSignInModal.addEventListener("click", () => {
   signinUsername.value = "";
   signinPassword.value = "";
   signInModalOverlay.style.display = "none";
+  clearSignInError();
 });
 
 signinBtn.addEventListener("click", async (e) => {
   e.preventDefault();
   const username = signinUsername.value;
   const password = signinPassword.value;
+  if (!username || !password) return;
+
   try {
     const userObj = await loginUser(username, password);
     console.log("userObj front end is: ", userObj);
-    if (userObj.message) return userObj.message;
+    if (userObj.message) {
+      signinPassword.insertAdjacentHTML(
+        "afterend",
+        `<div id='signin-error'>${userObj.message}</div>`
+      );
+      signinUsername.value = "";
+      signinPassword.value = "";
+      return;
+    }
     signInModalOverlay.style.display = "none";
   } catch (err) {
     console.log("Error in login user: ", err);
@@ -227,6 +244,14 @@ signinBtn.addEventListener("click", async (e) => {
   console.log("username is: ", username, "password is: ", password);
   signinUsername.value = "";
   signinPassword.value = "";
+});
+
+signinUsername.addEventListener("input", () => {
+  clearSignInError();
+});
+
+signinPassword.addEventListener("input", () => {
+  clearSignInError();
 });
 
 todoOutputArea.addEventListener("click", async (e) => {
