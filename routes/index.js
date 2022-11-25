@@ -12,6 +12,20 @@ apiRouter.get("/", (req, res) => {
   res.send("hello there!");
 });
 
+function verifyToken(req, res, next) {
+  const bearerToken = req.headers["authorization"].split(" ")[1];
+  console.log("🔴", bearerToken);
+
+  if (bearerToken == "null") {
+    console.log("no token.....");
+    res.sendStatus(403);
+    next();
+  } else {
+    req.token = bearerToken;
+    next();
+  }
+}
+
 apiRouter.post("/login", async (req, res) => {
   const { username, password } = req.body;
   console.log("username in routes: ", username);
@@ -34,9 +48,15 @@ apiRouter.post("/login", async (req, res) => {
   }
 });
 
-apiRouter.post("/todos", async (req, res) => {
+apiRouter.post("/todos", verifyToken, async (req, res) => {
   let { user_id } = req.body;
+  console.log("req.body does have token? ", req.token);
+  console.log("headers??????: ", req.headers);
   console.log("user id is: ", user_id);
+
+  if (!req.token) {
+    res.send("Hmmmmm I think you might be lost..");
+  }
   try {
     const todoList = await db_getTodos(user_id);
     console.log("Routes todolist is: ", todoList);
