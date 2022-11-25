@@ -6,6 +6,7 @@ const signInModalContainer = document.querySelector("#signin-modal-container");
 const signInModalDetails = document.querySelector("#signin-modal-details");
 const signInModalCancelBtn = document.querySelector("#signin-modal-cancel-btn");
 const todoOutputArea = document.querySelector("#todo-output");
+const displayedName = document.getElementById("nav-displayed-username");
 const currentTodoContainer = document.getElementById(
   "current-todo-inner-container"
 );
@@ -37,6 +38,7 @@ const getTodos = async (user_id) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({ user_id }),
     });
@@ -119,7 +121,7 @@ const getTodos = async (user_id) => {
                     <div id='todo-card-controls'>
                       <div class='todo-card-btns delete' data-action='delete' data-id=${
                         element.todo_id
-                      }>&#10006;</div>
+                      }>&#128465;</div>
                       <div class='todo-card-btns complete' data-action='complete' data-id=${
                         element.todo_id
                       }>&#10004;</div>
@@ -191,9 +193,8 @@ const loginUser = async (username, password) => {
         password,
       }),
     });
-    console.log("result in public is: ", result);
     const userObj = await result.json();
-    console.log("userObj in public: ", userObj);
+
     return userObj;
   } catch (err) {
     console.log("Error in loginUser: ", err);
@@ -205,6 +206,11 @@ const clearSignInError = () => {
   if (errMessage) {
     errMessage.innerText = "";
   }
+};
+
+const setLocalStorage = (token, userObject) => {
+  localStorage.setItem("token", token);
+  localStorage.setItem("userObject", JSON.stringify(userObject));
 };
 // Event Listeners ====================================
 openSignInModal.addEventListener("click", () => {
@@ -226,7 +232,7 @@ signinBtn.addEventListener("click", async (e) => {
 
   try {
     const userObj = await loginUser(username, password);
-    console.log("userObj front end is: ", userObj);
+
     if (userObj.message) {
       signinPassword.insertAdjacentHTML(
         "afterend",
@@ -236,6 +242,10 @@ signinBtn.addEventListener("click", async (e) => {
       signinPassword.value = "";
       return;
     }
+    const { token, verifiedUser } = userObj;
+    setLocalStorage(token, verifiedUser);
+    displayedName.innerText = verifiedUser.username;
+    await getTodos(verifiedUser.user_id);
     signInModalOverlay.style.display = "none";
   } catch (err) {
     console.log("Error in login user: ", err);
@@ -269,8 +279,13 @@ todoOutputArea.addEventListener("click", async (e) => {
       let todoId = e.target.dataset.id;
       console.log(todoId);
       const result = await updateTodo(todoId);
-      console.log("flag: ", result);
-      const todosAfterComplete = await getTodos(2);
+      console.log(
+        "flag: ",
+        JSON.parse(localStorage.getItem("userObject")).user_id
+      );
+      const todosAfterComplete = await getTodos(
+        JSON.parse(localStorage.getItem("userObject")).user_id
+      );
       console.log("💡💡💡💡💡💡", todosAfterComplete);
     }
   } catch (err) {
@@ -278,4 +293,4 @@ todoOutputArea.addEventListener("click", async (e) => {
   }
 });
 
-getTodos(2);
+// getTodos(2);
