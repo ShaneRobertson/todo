@@ -5,6 +5,7 @@ const signInModalOverlay = document.getElementById("signin-modal-overlay");
 const signInModalContainer = document.querySelector("#signin-modal-container");
 const signInModalDetails = document.querySelector("#signin-modal-details");
 const signInModalCancelBtn = document.querySelector("#signin-modal-cancel-btn");
+const logOutBtn = document.getElementById("nav-logout-btn");
 const todoOutputArea = document.querySelector("#todo-output");
 const displayedName = document.getElementById("nav-displayed-username");
 const currentTodoContainer = document.getElementById(
@@ -201,6 +202,12 @@ const loginUser = async (username, password) => {
   }
 };
 
+const clearOutputArea = () => {
+  currentTodoContainer.innerHTML = "";
+  expiredTodoContainer.innerHTML = "";
+  completedTodoContainer.innerHTML = "";
+};
+
 const clearSignInError = () => {
   const errMessage = document.getElementById("signin-error");
   if (errMessage) {
@@ -247,6 +254,10 @@ signinBtn.addEventListener("click", async (e) => {
     displayedName.innerText = verifiedUser.username;
     await getTodos(verifiedUser.user_id);
     signInModalOverlay.style.display = "none";
+    console.log("signInModal: ", signInModalOverlay);
+    openSignInModal.style.display = "none";
+    console.log("logout button: ", logOutBtn);
+    logOutBtn.style.display = "block";
   } catch (err) {
     console.log("Error in login user: ", err);
   }
@@ -264,14 +275,21 @@ signinPassword.addEventListener("input", () => {
   clearSignInError();
 });
 
+logOutBtn.addEventListener("click", () => {
+  openSignInModal.style.display = "block";
+  displayedName.innerText = "Guest";
+  localStorage.clear();
+  logOutBtn.style.display = "none";
+  clearOutputArea();
+});
+
 todoOutputArea.addEventListener("click", async (e) => {
-  console.log("parent listener: ", todoOutputArea);
   try {
     if (e.target.dataset.action == "delete") {
       console.log("delete listener");
       let todoId = e.target.dataset.id;
       const result = await deleteTodo(todoId);
-      // console.log("flag: ", result);
+
       await getTodos(2);
     }
     if (e.target.dataset.action == "complete") {

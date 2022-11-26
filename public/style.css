@@ -54,12 +54,18 @@
   width: 3.5rem;
 }
 .nav-controls {
-  list-style-type: none;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 1rem;
 }
 
-.nav-controls li {
-  display: inline-block;
-  margin-right: 1rem;
+.nav-controls button {
+  margin-left: 1rem;
+}
+
+#nav-logout-btn {
+  display: none;
 }
 
 /* -- signin styling --  */
