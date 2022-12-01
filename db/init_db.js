@@ -28,9 +28,9 @@ async function buildDB() {
             CREATE TABLE todos (
                 todo_id SERIAL PRIMARY KEY,
                 title VARCHAR(75) NOT NULL,
-                description VARCHAR(250),
                 due_date DATE NOT NULL,
-                is_complete BOOLEAN DEFAULT FALSE,
+                status VARCHAR(25) DEFAULT 'inProgress',
+                priority VARCHAR(10) DEFAULT 'high',
                 user_id INT REFERENCES users(user_id)
             );
         `);
@@ -52,46 +52,38 @@ async function buildDB() {
 // Sample Data =================
 let newTodo1 = {
   title: "Take out the garbage",
-  description: "This is todo1s description",
   due_date: "2022-11-15",
   user_id: 1,
-  is_complete: true,
 };
 
 let newTodo2 = {
   title: "Study React",
-  description: "This is todo2s description",
   due_date: "2021-07-02",
   user_id: 1,
 };
 
 let newTodo3 = {
   title: "Follow Noahs advice",
-  description: "This is todo3s description",
   due_date: "2022-12-3",
   user_id: 2,
 };
 
 let newTodo4 = {
   title: "type this title",
-  description: "This is todo4s description",
   due_date: "2023-12-31",
   user_id: 2,
 };
 
 let newTodo5 = {
   title: "Find a new house",
-  description: "This is todo5s description",
   due_date: "2021-05-22",
   user_id: 2,
 };
 
 let newTodo6 = {
   title: "Save Hyrule from Gananondorf",
-  description: "This is todo6s description",
   due_date: "2022-08-01",
   user_id: 2,
-  is_complete: true,
 };
 
 let user1 = {

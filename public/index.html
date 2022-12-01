@@ -12,6 +12,20 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vollkorn&display=swap"
+      rel="stylesheet"
+    />
 
     <title>Todo App</title>
   </head>
@@ -21,7 +35,7 @@
         <div class="nav-container">
           <div class="nav-logo-name">
             <img id="logo" alt="todo" src="./images/maybe.jpg" />
-            <h3>Chore List</h3>
+            <h3>Todo App</h3>
           </div>
           <div class="nav-controls">
             <div id="nav-displayed-username">Guest</div>
@@ -90,19 +104,84 @@
             <button id="create-todo-btn">Create</button>
           </form>
         </div>
-        <!-- Todo output area -->
-        <div id="todo-output">
-          <div id="current-todo-outer-container">
-            <span id="row-header">Current</span>
-            <div id="current-todo-inner-container"></div>
+
+        <nav>
+          <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a
+              class="nav-item nav-link active"
+              id="nav-all-tab"
+              data-toggle="tab"
+              href="#nav-all"
+              role="tab"
+              aria-controls="nav-all"
+              aria-selected="false"
+              >All</a
+            >
+            <a
+              class="nav-item nav-link"
+              id="nav-Current-tab"
+              data-toggle="tab"
+              href="#nav-Current"
+              role="tab"
+              aria-controls="nav-Current"
+              aria-selected="true"
+              >Current</a
+            >
+            <a
+              class="nav-item nav-link"
+              id="nav-completed-tab"
+              data-toggle="tab"
+              href="#nav-completed"
+              role="tab"
+              aria-controls="nav-completed"
+              aria-selected="false"
+              >Completed</a
+            >
           </div>
-          <div id="expired-todo-outer-container">
-            <span id="row-header">Expired</span>
-            <div id="expired-todo-inner-container"></div>
+        </nav>
+        <div
+          class="tab-pane fade show active"
+          id="nav-all"
+          role="tabpanel"
+          aria-labelledby="nav-all-tab"
+        >
+          <!-- Where the Todos get printed out -->
+
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Date</th>
+                <th scope="col">Status</th>
+                <th scope="col">Priority</th>
+              </tr>
+            </thead>
+            <tbody id="todo-output-area">
+              <tr>
+                <th scope="row">Fancy Title Here</th>
+                <td>1775/11/10</td>
+                <td>completed</td>
+                <td>Top</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tab-content" id="nav-tabContent">
+          <div
+            class="tab-pane fade"
+            id="nav-Current"
+            role="tabpanel"
+            aria-labelledby="nav-Current-tab"
+          >
+            Current
           </div>
-          <div id="completed-todo-outer-container">
-            <span id="row-header">Completed</span>
-            <div id="completed-todo-inner-container"></div>
+          <div
+            class="tab-pane fade"
+            id="nav-completed"
+            role="tabpanel"
+            aria-labelledby="nav-completed-tab"
+          >
+            Completed
           </div>
         </div>
       </div>

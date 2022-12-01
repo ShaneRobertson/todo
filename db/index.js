@@ -41,14 +41,14 @@ const db_getUser = async (username, db_password) => {
   }
 };
 
-const db_createTodo = async ({ title, description, due_date, user_id }) => {
+const db_createTodo = async ({ title, due_date, user_id }) => {
   try {
     const { rows } = await client.query(
       `
-        INSERT INTO todos(title, description, due_date,  user_id)
-        VALUES ($1, $2, $3, $4) RETURNING *;
+        INSERT INTO todos(title,  due_date,  user_id)
+        VALUES ($1, $2, $3) RETURNING *;
         `,
-      [title, description, due_date, user_id]
+      [title, due_date, user_id]
     );
     console.log(rows);
   } catch (err) {

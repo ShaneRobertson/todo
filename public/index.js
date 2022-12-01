@@ -2,21 +2,22 @@
 const openSignInModal = document.getElementById("nav-signin-btn");
 const closeSignInModal = document.getElementById("siginin-modal-close");
 const signInModalOverlay = document.getElementById("signin-modal-overlay");
-const signInModalContainer = document.querySelector("#signin-modal-container");
-const signInModalDetails = document.querySelector("#signin-modal-details");
-const signInModalCancelBtn = document.querySelector("#signin-modal-cancel-btn");
+const signInModalContainer = document.getElementById("signin-modal-container");
+const signInModalDetails = document.getElementById("signin-modal-details");
+const signInModalCancelBtn = document.getElementById("signin-modal-cancel-btn");
 const logOutBtn = document.getElementById("nav-logout-btn");
-const todoOutputArea = document.querySelector("#todo-output");
+const todoOutputArea = document.getElementById("todo-output-area");
+const tableContainer = document.querySelector("table");
 const displayedName = document.getElementById("nav-displayed-username");
-const currentTodoContainer = document.getElementById(
-  "current-todo-inner-container"
-);
-const expiredTodoContainer = document.getElementById(
-  "expired-todo-inner-container"
-);
-const completedTodoContainer = document.getElementById(
-  "completed-todo-inner-container"
-);
+// const currentTodoContainer = document.getElementById(
+//   "current-todo-inner-container"
+// );
+// const expiredTodoContainer = document.getElementById(
+//   "expired-todo-inner-container"
+// );
+// const completedTodoContainer = document.getElementById(
+//   "completed-todo-inner-container"
+// );
 const signinUsername = document.getElementById("floatingUsername");
 const signinPassword = document.getElementById("floatingPassword");
 const signinBtn = document.getElementById("signin-modal-submit");
@@ -26,14 +27,9 @@ const year = date.toLocaleString("default", { year: "numeric" });
 const month = date.toLocaleString("default", { month: "2-digit" });
 const day = date.toLocaleString("default", { day: "2-digit" });
 const currentDate = `${year}-${month}-${day}`;
-
+console.log(currentDate);
 // Functions ========================================
 const getTodos = async (user_id) => {
-  // console.log(user_id);
-  currentTodoContainer.innerHTML = "";
-  expiredTodoContainer.innerHTML = "";
-  completedTodoContainer.innerHTML = "";
-
   try {
     const result = await fetch("/api/todos", {
       method: "POST",
@@ -45,103 +41,41 @@ const getTodos = async (user_id) => {
     });
 
     const todos = await result.json();
+    todoOutputArea.innerHTML = "";
+    todos.reverse().forEach((todo) => {
+      const { title, due_date, status, priority, todo_id } = todo;
+      const badge_color = determineBadgeColor(due_date, status);
+      const badge_description =
+        badge_color == "success"
+          ? "Completed"
+          : badge_color == "primary"
+          ? "In Progress"
+          : "Expired";
+      let date = due_date.slice(0, due_date.indexOf("T"));
 
-    todos.reverse().forEach((element) => {
-      let endOfDate = element.due_date.indexOf("T");
-      let currentOrExpired =
-        element.due_date.slice(0, endOfDate) > currentDate
-          ? currentTodoContainer
-          : expiredTodoContainer;
-
-      if (element.is_complete) {
-        completedTodoContainer.insertAdjacentHTML(
-          "beforeend",
-          `<div class='todo-card ${
-            element.due_date.slice(0, endOfDate) > currentDate
-              ? "expired"
-              : "upcoming"
-          }'>
-                    <div id='todo-card-header-container'>
-                        <div id='todo-card-date-indicator-outer'>
-                            <div id='date-indicator-inner'>
-                              <div id='due-date-indicator-${
-                                element.due_date.slice(0, endOfDate) >
-                                currentDate
-                                  ? "upcoming"
-                                  : "expired"
-                              }'></div>
-                              <span id='todo-date'>Due: ${element.due_date.slice(
-                                0,
-                                endOfDate
-                              )}</span>
-                            </div>
-                        </div>  
-
-                    
-                        <div id='todo-card-controls'>
-                        <div class='todo-card-btns delete' data-action='delete' data-id=${
-                          element.todo_id
-                        }>&#10006;</div>
-                        <div class='todo-card-btns complete' data-action='complete' data-id=${
-                          element.todo_id
-                        }>&#10004;</div>
-                        <div class='todo-card-btns edit' data-action='edit' data-id=${
-                          element.todo_id
-                        }>&#9998;</div>
-                      </div>
-                              
-                  </div>
-                    <h3>${element.title}</h3>
-                    <p id='todo-description'>${element.description}</p>
-            </div>
+      todoOutputArea.insertAdjacentHTML(
+        "afterend",
         `
-        );
-      } else {
-        currentOrExpired.insertAdjacentHTML(
-          "beforeend",
-          `<div class='todo-card ${
-            element.due_date.slice(0, endOfDate) > currentDate
-              ? "expired"
-              : "upcoming"
-          }'>
-              <div id='todo-card-header-container'>
-                  <div id='todo-card-date-indicator-outer'>
-                      <div id='date-indicator-inner'>
-                        <div id='due-date-indicator-${
-                          element.due_date.slice(0, endOfDate) > currentDate
-                            ? "upcoming"
-                            : "expired"
-                        }'></div>
-                        <span id='todo-date'>Due: ${element.due_date.slice(
-                          0,
-                          endOfDate
-                        )}</span>
-                      </div>
-                  </div>  
-
-                    <div id='todo-card-controls'>
-                      <div class='todo-card-btns delete' data-action='delete' data-id=${
-                        element.todo_id
-                      }>&#128465;</div>
-                      <div class='todo-card-btns complete' data-action='complete' data-id=${
-                        element.todo_id
-                      }>&#10004;</div>
-                      <div class='todo-card-btns edit' data-action='edit' data-id=${
-                        element.todo_id
-                      }>&#9998;</div>
-                    </div>
-                              
-                  </div>
-                    <h3>${element.title}</h3>
-                    <p id='todo-description'>${element.description}</p>
-            </div>
-        `
-        );
-      }
+      <tr data-id=${todo_id}>
+      <th scope="row">${title}</th>
+      <td>${date}</td>
+      <td><span class="badge bg-${badge_color}">${badge_description}</span></td>
+      <td>${priority}</td>
+      </tr>
+      `
+      );
     });
   } catch (err) {
     console.log("getTodos: ", err);
   }
+};
+
+const determineBadgeColor = (dueDate, curStatus) => {
+  let isExpired = currentDate > dueDate;
+  console.log("isExpired: ", isExpired);
+  let statusBadge = curStatus == "inProgress" ? "primary" : "success";
+
+  return isExpired ? "danger" : statusBadge;
 };
 
 const deleteTodo = async (todo_id) => {
@@ -203,9 +137,7 @@ const loginUser = async (username, password) => {
 };
 
 const clearOutputArea = () => {
-  currentTodoContainer.innerHTML = "";
-  expiredTodoContainer.innerHTML = "";
-  completedTodoContainer.innerHTML = "";
+  todoOutputArea.innerHTML = "";
 };
 
 const clearSignInError = () => {
@@ -219,7 +151,9 @@ const setLocalStorage = (token, userObject) => {
   localStorage.setItem("token", token);
   localStorage.setItem("userObject", JSON.stringify(userObject));
 };
+
 // Event Listeners ====================================
+
 openSignInModal.addEventListener("click", () => {
   signInModalOverlay.style.display = "block";
 });
@@ -254,15 +188,12 @@ signinBtn.addEventListener("click", async (e) => {
     displayedName.innerText = verifiedUser.username;
     await getTodos(verifiedUser.user_id);
     signInModalOverlay.style.display = "none";
-    console.log("signInModal: ", signInModalOverlay);
     openSignInModal.style.display = "none";
-    console.log("logout button: ", logOutBtn);
     logOutBtn.style.display = "block";
   } catch (err) {
     console.log("Error in login user: ", err);
   }
 
-  console.log("username is: ", username, "password is: ", password);
   signinUsername.value = "";
   signinPassword.value = "";
 });
@@ -283,18 +214,20 @@ logOutBtn.addEventListener("click", () => {
   clearOutputArea();
 });
 
-todoOutputArea.addEventListener("click", async (e) => {
+tableContainer.addEventListener("click", async (e) => {
+  console.dir(e.target);
   try {
-    if (e.target.dataset.action == "delete") {
-      console.log("delete listener");
-      let todoId = e.target.dataset.id;
-      const result = await deleteTodo(todoId);
+    if (e.target.dataset) {
+      console.log(e.target.dataset);
+      let todoId = e.target.parentElement.dataset.id;
+      console.log("todoID is: ", todoId);
+      // const result = await updateTodo(todoId);
 
-      await getTodos(2);
+      // await getTodos(2);
     }
     if (e.target.dataset.action == "complete") {
       console.log("complete lisener");
-      let todoId = e.target.dataset.id;
+      let todoId = e.target.parentElement.dataset.id;
       console.log(todoId);
       const result = await updateTodo(todoId);
       console.log(
@@ -310,5 +243,3 @@ todoOutputArea.addEventListener("click", async (e) => {
     console.log("Error in delete deleteTodo listener =>", err);
   }
 });
-
-// getTodos(2);
