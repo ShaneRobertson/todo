@@ -9,27 +9,26 @@ const logOutBtn = document.getElementById("nav-logout-btn");
 const todoOutputArea = document.getElementById("todo-output-area");
 const tableContainer = document.querySelector("table");
 const displayedName = document.getElementById("nav-displayed-username");
-// const currentTodoContainer = document.getElementById(
-//   "current-todo-inner-container"
-// );
-// const expiredTodoContainer = document.getElementById(
-//   "expired-todo-inner-container"
-// );
-// const completedTodoContainer = document.getElementById(
-//   "completed-todo-inner-container"
-// );
 const signinUsername = document.getElementById("floatingUsername");
 const signinPassword = document.getElementById("floatingPassword");
 const signinBtn = document.getElementById("signin-modal-submit");
+
+const openEditModal = document.getElementById("edit-modal-icon");
+const editModalBody = document.getElementById("edit-modal");
+const closeEditModal = document.getElementById("close-edit-modal");
+const saveChanges = document.getElementById("save-changes");
 
 const date = new Date();
 const year = date.toLocaleString("default", { year: "numeric" });
 const month = date.toLocaleString("default", { month: "2-digit" });
 const day = date.toLocaleString("default", { day: "2-digit" });
 const currentDate = `${year}-${month}-${day}`;
-console.log(currentDate);
+
 // Functions ========================================
 const getTodos = async (user_id) => {
+  debugger;
+  todoOutputArea.innerHTML = "";
+  console.dir(todoOutputArea);
   try {
     const result = await fetch("/api/todos", {
       method: "POST",
@@ -41,7 +40,7 @@ const getTodos = async (user_id) => {
     });
 
     const todos = await result.json();
-    todoOutputArea.innerHTML = "";
+
     todos.reverse().forEach((todo) => {
       const { title, due_date, status, priority, todo_id } = todo;
       const badge_color = determineBadgeColor(due_date, status);
@@ -54,13 +53,16 @@ const getTodos = async (user_id) => {
       let date = due_date.slice(0, due_date.indexOf("T"));
 
       todoOutputArea.insertAdjacentHTML(
-        "afterend",
+        "afterbegin",
         `
-      <tr data-id=${todo_id}>
+      <tr>
       <th scope="row">${title}</th>
       <td>${date}</td>
       <td><span class="badge bg-${badge_color}">${badge_description}</span></td>
-      <td>${priority}</td>
+      <td><svg  id="edit-modal-icon" data-id=${todo_id} class="text-info" data-bs-toggle="modal" data-bs-target="#staticBackdrop" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+      <path data-id=${todo_id} d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+      <path data-id=${todo_id} fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+    </svg></td>
       </tr>
       `
       );
@@ -87,24 +89,22 @@ const deleteTodo = async (todo_id) => {
       },
       body: JSON.stringify({ todo_id }),
     });
-
-    // HARDCODED USER ID HERE =========================
-
-    // console.log("outcome is: ", outcome);
   } catch (err) {
     console.log("error in deleteTodo Function: ", err);
   }
 };
 
-const updateTodo = async (todo_id) => {
+const updateTodo = async (todo_id, title, due_date) => {
   try {
-    const result = await fetch("/api/complete", {
+    const result = await fetch("/api/update", {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         todo_id,
+        title,
+        due_date,
       }),
     });
 
@@ -217,29 +217,59 @@ logOutBtn.addEventListener("click", () => {
 tableContainer.addEventListener("click", async (e) => {
   console.dir(e.target);
   try {
-    if (e.target.dataset) {
-      console.log(e.target.dataset);
-      let todoId = e.target.parentElement.dataset.id;
-      console.log("todoID is: ", todoId);
-      // const result = await updateTodo(todoId);
-
-      // await getTodos(2);
-    }
-    if (e.target.dataset.action == "complete") {
-      console.log("complete lisener");
-      let todoId = e.target.parentElement.dataset.id;
-      console.log(todoId);
-      const result = await updateTodo(todoId);
-      console.log(
-        "flag: ",
-        JSON.parse(localStorage.getItem("userObject")).user_id
+    if (e.target.dataset.id) {
+      let todoId = e.target.dataset.id;
+      editModalBody.insertAdjacentHTML(
+        "afterbegin",
+        `
+        <div data-id=${todoId}  id='edit-todo-id' class="form-floating mb-3">
+        <input type="text" class="form-control" id="edit-title" placeholder="#">
+        <label for="edit-title">New Title Here</label>
+      </div>
+      <label for="edit-date">Date</label>
+      <input type="date" id="edit-date" />
+      `
       );
-      const todosAfterComplete = await getTodos(
-        JSON.parse(localStorage.getItem("userObject")).user_id
-      );
-      console.log("💡💡💡💡💡💡", todosAfterComplete);
     }
+    // if (e.target.dataset.action == "complete") {
+    //   console.log("complete lisener");
+    //   let todoId = e.target.parentElement.dataset.id;
+    //   console.log(todoId);
+    //   const result = await updateTodo(todoId);
+    //   console.log(
+    //     "flag: ",
+    //     JSON.parse(localStorage.getItem("userObject")).user_id
+    //   );
+    //   const todosAfterComplete = await getTodos(
+    //     JSON.parse(localStorage.getItem("userObject")).user_id
+    //   );
+    //   console.log("💡💡💡💡💡💡", todosAfterComplete);
+    // }
   } catch (err) {
-    console.log("Error in delete deleteTodo listener =>", err);
+    console.log("Error in in the table =>", err);
+  }
+});
+
+closeEditModal.addEventListener("click", async (e) => {
+  e.preventDefault();
+
+  const { user_id } = JSON.parse(localStorage.getItem("userObject"));
+  console.log("user_id is: ", user_id);
+  editModalBody.innerHTML = "";
+  await getTodos(user_id);
+
+  // todoOutputArea.innerHTML = "";
+});
+
+saveChanges.addEventListener("click", async (e) => {
+  const newTitle = document.getElementById("edit-title").value;
+  const newDate = document.getElementById("edit-date").value;
+  const todoId = document.getElementById("edit-todo-id").dataset.id;
+  try {
+    const result = await updateTodo(todoId, newTitle, newDate);
+    const updatedTodo = await result.json();
+    console.log("SUCCESSSSSS: ", updatedTodo);
+  } catch (err) {
+    console.log("Close edit modal error: ", err);
   }
 });
