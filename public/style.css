@@ -120,9 +120,6 @@
 }
 
 /* -- todo cards -- */
-tbody tr:hover {
-  transform: scale(1.008);
-}
 
 th {
   font-family: "Vollkorn", serif;
@@ -160,6 +157,12 @@ th {
   height: 40%;
 }
 
-#edit-modal-icon {
+#edit-modal-icon:hover,
+#delete-modal-icon:hover {
   cursor: pointer;
+  transform: scale(1.1);
+}
+
+#delete-modal-icon {
+  margin-left: 0.5rem;
 }
