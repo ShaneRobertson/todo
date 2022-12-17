@@ -20,6 +20,9 @@ const saveChanges = document.getElementById("save-changes");
 const openDeleteModal = document.getElementById("delete-modal-icon");
 const confirmDelete = document.getElementById("confirm-delete");
 const deleteModalBody = document.getElementById("delete-modal-body");
+const createTodoBtn = document.getElementById("create-todo-button");
+const createTodoTitle = document.getElementById("create-todo-title");
+const createTodoDate = document.getElementById("create-todo-date");
 
 const date = new Date();
 const year = date.toLocaleString("default", { year: "numeric" });
@@ -65,7 +68,7 @@ const getTodos = async (user_id) => {
       <td><span class="badge bg-${badge_color}">${badge_description}</span></td>
       <td><svg  id="edit-modal-icon" data-id=${todo_id} class="text-info" data-bs-toggle="modal" data-bs-target="#staticBackdrop" data-action='edit' =xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
       <path data-action='edit' data-id=${todo_id} d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-      <pathdata-action='edit' data-id=${todo_id} fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+      <path data-action='edit' data-id=${todo_id} fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
     </svg>
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" 
     data-bs-toggle="modal"
@@ -112,6 +115,27 @@ const determineBadgeColor = (dueDate, curStatus) => {
   let statusBadge = curStatus == "inProgress" ? "primary" : "success";
 
   return isExpired ? "danger" : statusBadge;
+};
+
+const createTodo = async (title, due_date, user_id) => {
+  try {
+    const result = await fetch("/api/create", {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({
+        title,
+        due_date,
+        user_id,
+      }),
+    });
+    const todos = await result.json();
+    console.log(todos);
+  } catch (error) {
+    console.log("createTodo error: ", error);
+  }
 };
 
 const deleteTodo = async (todo_id) => {
@@ -232,6 +256,7 @@ signinBtn.addEventListener("click", async (e) => {
     }
     const { token, verifiedUser } = userObj;
     setLocalStorage(token, verifiedUser);
+    createTodoBtn.removeAttribute("disabled");
     displayedName.innerText = verifiedUser.username;
     await getTodos(verifiedUser.user_id);
     signInModalOverlay.style.display = "none";
@@ -256,6 +281,7 @@ signinPassword.addEventListener("input", () => {
 logOutBtn.addEventListener("click", () => {
   openSignInModal.style.display = "block";
   displayedName.innerText = "Guest";
+  createTodoBtn.setAttribute("disabled", "true");
   localStorage.clear();
   logOutBtn.style.display = "none";
   clearOutputArea();
@@ -324,4 +350,25 @@ confirmDelete.addEventListener("click", async (e) => {
   const result = await deleteTodo(todoId);
   console.log("Delete Todo result => ", result);
   await getTodos(JSON.parse(localStorage.getItem("userObject")).user_id);
+});
+
+createTodoBtn.addEventListener("click", async (e) => {
+  try {
+    if (!localStorage.getItem("token")) return;
+    const title = createTodoTitle.value;
+    const due_date = createTodoDate.value;
+    const user_id = JSON.parse(localStorage.getItem("userObject")).user_id;
+    console.log("userId local storage: ", user_id);
+    if (!title || !due_date) {
+      console.log(title, due_date, user_id);
+      return;
+    }
+    console.log(title, due_date, user_id);
+    const result = await createTodo(title, due_date, user_id);
+    await getTodos(user_id);
+    createTodoTitle.value = "";
+    createTodoDate.value = "";
+  } catch (error) {
+    console.log("create todo error: ", error);
+  }
 });

@@ -6,6 +6,7 @@ const {
   db_deleteTodo,
   db_updateTodo,
   db_getUser,
+  db_createTodo,
 } = require("../db/index");
 
 apiRouter.get("/", (req, res) => {
@@ -14,7 +15,7 @@ apiRouter.get("/", (req, res) => {
 
 function verifyToken(req, res, next) {
   const bearerToken = req.headers["authorization"].split(" ")[1];
-  console.log("🔴", bearerToken);
+  // console.log("🔴", bearerToken);
 
   if (bearerToken == "null") {
     console.log("no token.....");
@@ -48,10 +49,18 @@ apiRouter.post("/login", async (req, res) => {
   }
 });
 
-apiRouter.patch("/todo", verifyToken, async (req, res) => {
-  const { todoId } = req.body;
+apiRouter.post("/create", verifyToken, async (req, res) => {
+  const { title, due_date, user_id } = req.body;
+  console.log(req.body);
+  // console.log(title, due_date, userId);
   if (!req.token) {
     res.send("Hmmmmm I think you might be lost..");
+  }
+  try {
+    const result = await db_createTodo({ title, due_date, user_id });
+    res.send(result);
+  } catch (error) {
+    console.log("create todo in routes error: ", error);
   }
 });
 
@@ -114,4 +123,5 @@ apiRouter.patch("/complete", async (req, res) => {
     console.log("complete todo in Routes error: ", err);
   }
 });
+
 module.exports = { apiRouter };
