@@ -42,6 +42,9 @@ const db_getUser = async (username, db_password) => {
 };
 
 const db_createTodo = async ({ title, due_date, user_id }) => {
+  console.log("title: ", title);
+  console.log("due_date: ", due_date);
+  console.log("user_id: ", user_id);
   try {
     const { rows } = await client.query(
       `
@@ -51,6 +54,7 @@ const db_createTodo = async ({ title, due_date, user_id }) => {
       [title, due_date, user_id]
     );
     console.log(rows);
+    return rows;
   } catch (err) {
     console.log("db_createTodo err: ", err);
   }
@@ -74,17 +78,6 @@ const db_getTodos = async (user_id) => {
     console.log("getTodos: ", err);
   }
 };
-
-// const db_getTodo = async (todo_id) =>{
-//   try{
-//     const {rows} = await client.query(`
-//       SELECT
-//       `)
-
-//   } catch (err){
-//     console.log('db_getTodo error: ', err)
-//   }
-// }
 
 // ============= Delete Todos ==============
 const db_deleteTodo = async (todo_id) => {
