@@ -48,11 +48,15 @@ apiRouter.post("/login", async (req, res) => {
   }
 });
 
+apiRouter.patch("/todo", verifyToken, async (req, res) => {
+  const { todoId } = req.body;
+  if (!req.token) {
+    res.send("Hmmmmm I think you might be lost..");
+  }
+});
+
 apiRouter.post("/todos", verifyToken, async (req, res) => {
   let { user_id } = req.body;
-  console.log("req.body does have token? ", req.token);
-  console.log("headers??????: ", req.headers);
-  console.log("user id is: ", user_id);
 
   if (!req.token) {
     res.send("Hmmmmm I think you might be lost..");
@@ -66,42 +70,36 @@ apiRouter.post("/todos", verifyToken, async (req, res) => {
   }
 });
 
-apiRouter.delete("/delete", async (req, res) => {
+apiRouter.delete("/delete", verifyToken, async (req, res) => {
   console.log("in delete route req.body: ", req.body);
   try {
     const { todo_id } = req.body;
     const result = await db_deleteTodo(todo_id);
     console.log("result is: ", result);
-    res.send(`todo_id ${todo_id} has been deleted`);
+    res.json(`todo_id ${todo_id} has been deleted`);
   } catch (err) {
     console.log("error in /todo/delete: ", err);
   }
 });
 
-apiRouter.patch("/update", async (req, res) => {
+apiRouter.patch("/update", verifyToken, async (req, res) => {
   try {
     const updateFields = {};
-    const { todo_id, title, description, due_date } = req.body;
+    const { todo_id, title, due_date } = req.body;
 
     if (title) {
       updateFields.title = title;
     }
-    if (description) {
-      updateFields.description = description;
-    }
     if (due_date) {
       updateFields.due_date = due_date;
     }
-    if (is_complete) {
-      updateFields.is_complete = is_complete;
-    }
 
-    const result = await updateTodo(todo_id, updateFields);
-    const updatedTodo = result.json();
+    const updatedTodo = await db_updateTodo(todo_id, updateFields);
+
     console.log("updated todo in Routes: ", updatedTodo);
     res.send(updatedTodo);
   } catch (err) {
-    console.log("update todo in Routes: ", err);
+    console.log("Update Todo error in Routes: ", err);
   }
 });
 

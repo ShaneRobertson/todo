@@ -75,16 +75,29 @@ const db_getTodos = async (user_id) => {
   }
 };
 
+// const db_getTodo = async (todo_id) =>{
+//   try{
+//     const {rows} = await client.query(`
+//       SELECT
+//       `)
+
+//   } catch (err){
+//     console.log('db_getTodo error: ', err)
+//   }
+// }
+
 // ============= Delete Todos ==============
 const db_deleteTodo = async (todo_id) => {
   try {
-    await client.query(
+    const { rows } = await client.query(
       `
       DELETE FROM todos
       WHERE todo_id=$1
+      RETURNING *;
     `,
       [todo_id]
     );
+    return rows;
   } catch (err) {
     console.log("error in db_deleteTodo: ", err);
   }
