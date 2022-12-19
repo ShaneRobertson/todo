@@ -116,7 +116,7 @@
 #main-container {
   display: grid;
   grid-template-columns: 1fr 5fr;
-  grid-template-rows: 1fr;
+  grid-template-rows: minmax(1rem, 2rem);
 }
 
 /* -- todo cards -- */
@@ -129,6 +129,11 @@ th {
 #create-todo-form {
   grid-column: 1 /2;
   grid-row: 1 / 4;
+}
+
+#create-todo-error {
+  color: red;
+  display: none;
 }
 
 /* -- Edit Todo -- */
