@@ -7,6 +7,7 @@ const {
   db_updateTodo,
   db_getUser,
   db_createTodo,
+  db_createTodo,
 } = require("../db/index");
 
 apiRouter.get("/", (req, res) => {
@@ -15,6 +16,7 @@ apiRouter.get("/", (req, res) => {
 
 function verifyToken(req, res, next) {
   const bearerToken = req.headers["authorization"].split(" ")[1];
+  // console.log("🔴", bearerToken);
   // console.log("🔴", bearerToken);
 
   if (bearerToken == "null") {
@@ -66,6 +68,21 @@ apiRouter.post("/create", verifyToken, async (req, res) => {
   }
 });
 
+apiRouter.post("/create", verifyToken, async (req, res) => {
+  const { title, due_date, user_id } = req.body;
+  console.log(req.body);
+  // console.log(title, due_date, userId);
+  if (!req.token) {
+    res.send("Hmmmmm I think you might be lost..");
+  }
+  try {
+    const result = await db_createTodo({ title, due_date, user_id });
+    res.send(result);
+  } catch (error) {
+    console.log("create todo in routes error: ", error);
+  }
+});
+
 apiRouter.post("/todos", verifyToken, async (req, res) => {
   let { user_id } = req.body;
 
@@ -88,14 +105,17 @@ apiRouter.delete("/delete", verifyToken, async (req, res) => {
     const result = await db_deleteTodo(todo_id);
     console.log("result is: ", result);
     res.json(`todo_id ${todo_id} has been deleted`);
+    res.json(`todo_id ${todo_id} has been deleted`);
   } catch (err) {
     console.log("error in /todo/delete: ", err);
   }
 });
 
 apiRouter.patch("/update", verifyToken, async (req, res) => {
+apiRouter.patch("/update", verifyToken, async (req, res) => {
   try {
     const updateFields = {};
+    const { todo_id, title, due_date } = req.body;
     const { todo_id, title, due_date } = req.body;
 
     if (title) {
@@ -107,9 +127,12 @@ apiRouter.patch("/update", verifyToken, async (req, res) => {
 
     const updatedTodo = await db_updateTodo(todo_id, updateFields);
 
+    const updatedTodo = await db_updateTodo(todo_id, updateFields);
+
     console.log("updated todo in Routes: ", updatedTodo);
     res.send(updatedTodo);
   } catch (err) {
+    console.log("Update Todo error in Routes: ", err);
     console.log("Update Todo error in Routes: ", err);
   }
 });
@@ -125,5 +148,6 @@ apiRouter.patch("/complete", async (req, res) => {
     console.log("complete todo in Routes error: ", err);
   }
 });
+
 
 module.exports = { apiRouter };

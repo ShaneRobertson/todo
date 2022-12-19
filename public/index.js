@@ -34,7 +34,7 @@ const currentDate = `${year}-${month}-${day}`;
 
 const getTodos = async (user_id) => {
   todoOutputArea.innerHTML = "";
-
+  console.dir(todoOutputArea);
   try {
     console.log("fetching todos");
     const result = await fetch("/api/todos", {
@@ -47,7 +47,6 @@ const getTodos = async (user_id) => {
     });
     console.log("got a result: ", result);
     const todos = await result.json();
-    console.log("jsoning a result: ", todos);
     localStorage.setItem("todos", JSON.stringify(todos));
 
     todos.forEach((todo) => {
@@ -120,7 +119,6 @@ const determineBadgeColor = (dueDate, curStatus) => {
 };
 
 const createTodo = async (title, due_date, user_id) => {
-  debugger;
   try {
     const result = await fetch("/api/create", {
       method: "POST",
@@ -260,7 +258,6 @@ signinBtn.addEventListener("click", async (e) => {
     const { token, verifiedUser } = userObj;
     setLocalStorage(token, verifiedUser);
     createTodoBtn.removeAttribute("disabled");
-    console.log("hsdfasdfas");
     displayedName.innerText = verifiedUser.username;
     await getTodos(verifiedUser.user_id);
     signInModalOverlay.style.display = "none";
@@ -357,7 +354,6 @@ confirmDelete.addEventListener("click", async (e) => {
 });
 
 createTodoBtn.addEventListener("click", async (e) => {
-  e.preventDefault();
   try {
     if (!localStorage.getItem("token")) return;
     const title = createTodoTitle.value;
