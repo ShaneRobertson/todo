@@ -1,25 +1,48 @@
-// Dom Elements ========================
+// ======================Dom Elements ========================
+// --Sign in
 const openSignInModal = document.getElementById("nav-signin-btn");
 const closeSignInModal = document.getElementById("siginin-modal-close");
 const signInModalOverlay = document.getElementById("signin-modal-overlay");
 const signInModalContainer = document.getElementById("signin-modal-container");
 const signInModalDetails = document.getElementById("signin-modal-details");
 const signInModalCancelBtn = document.getElementById("signin-modal-cancel-btn");
-const logOutBtn = document.getElementById("nav-logout-btn");
-const todoOutputArea = document.getElementById("todo-output-area");
-const tableContainer = document.querySelector("table");
-const displayedName = document.getElementById("nav-displayed-username");
 const signinUsername = document.getElementById("floatingUsername");
 const signinPassword = document.getElementById("floatingPassword");
 const signinBtn = document.getElementById("signin-modal-submit");
 
+// ---- Register Modal ----
+const openRegisterModal = document.getElementById("nav-register-btn");
+const closeRegisterModal = document.getElementById("register-modal-close");
+const registerModalOverlay = document.getElementById("register-modal-overlay");
+const registerModalContainer = document.getElementById(
+  "register-modal-container"
+);
+const registerModalDetails = document.getElementById("register-modal-details");
+const registerModalCancelBtn = document.getElementById(
+  "register-modal-cancel-btn"
+);
+const registerUsername = document.getElementById("registerUsername");
+const registerPassword = document.getElementById("registerPassword");
+const registerBtn = document.getElementById("register-modal-submit");
+
+// -- General Elements
+const logOutBtn = document.getElementById("nav-logout-btn");
+const todoOutputArea = document.getElementById("todo-output-area");
+const tableContainer = document.querySelector("table");
+const displayedName = document.getElementById("nav-displayed-username");
+
+// ---- Edit Modal ----
 const openEditModal = document.getElementById("edit-modal-icon");
 const editModalBody = document.getElementById("edit-modal");
 const closeEditModal = document.getElementById("close-edit-modal");
 const saveChanges = document.getElementById("save-changes");
+
+// ---- Delete Modal ----
 const openDeleteModal = document.getElementById("delete-modal-icon");
 const confirmDelete = document.getElementById("confirm-delete");
 const deleteModalBody = document.getElementById("delete-modal-body");
+
+//---- Create Todo ----
 const createTodoBtn = document.getElementById("create-todo-button");
 const createTodoTitle = document.getElementById("create-todo-title");
 const createTodoDate = document.getElementById("create-todo-date");
@@ -198,6 +221,29 @@ const loginUser = async (username, password) => {
   }
 };
 
+const registerUser = async (username, password) => {
+  try {
+    const data = await fetch("/api/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+    });
+
+    const result = await data.json();
+    if (result.message) {
+    }
+    console.log("result in register user function: ", result);
+    return result;
+  } catch (error) {
+    console.log("Register user: ", error);
+  }
+};
+
 const clearOutputArea = () => {
   todoOutputArea.innerHTML = "";
 };
@@ -262,7 +308,9 @@ signinBtn.addEventListener("click", async (e) => {
     await getTodos(verifiedUser.user_id);
     signInModalOverlay.style.display = "none";
     openSignInModal.style.display = "none";
+    openRegisterModal.style.display = "none";
     logOutBtn.style.display = "block";
+    createTodoBtn.classList.toggle("border-danger");
   } catch (err) {
     console.log("Error in login user: ", err);
   }
@@ -279,12 +327,70 @@ signinPassword.addEventListener("input", () => {
   clearSignInError();
 });
 
+// -- Register User
+openRegisterModal.addEventListener("click", () => {
+  registerModalOverlay.style.display = "block";
+});
+
+closeRegisterModal.addEventListener("click", () => {
+  registerModalOverlay.style.display = "none";
+  clearSignInError();
+});
+
+registerBtn.addEventListener("click", async (e) => {
+  e.preventDefault();
+  const username = registerUsername.value;
+  const password = registerPassword.value;
+  console.log("username and password: ", username, password);
+  if (!username || !password) return;
+
+  try {
+    const userObj = await registerUser(username, password);
+    console.log("userobject", userObj);
+
+    if (userObj.message) {
+      registerPassword.insertAdjacentHTML(
+        "afterend",
+        `<div id='signin-error'>${userObj.message}</div>`
+      );
+      registerUsername.value = "";
+      registerPassword.value = "";
+      return;
+    }
+    const { token, verifiedUser } = userObj;
+    setLocalStorage(token, verifiedUser);
+    createTodoBtn.removeAttribute("disabled");
+    displayedName.innerText = verifiedUser.username;
+    await getTodos(verifiedUser.user_id);
+    registerModalOverlay.style.display = "none";
+    openRegisterModal.style.display = "none";
+    openSignInModal.style.display = "none";
+    logOutBtn.style.display = "block";
+    createTodoBtn.classList.toggle("border-danger");
+  } catch (err) {
+    console.log("Error in login user: ", err);
+  }
+
+  registerUsername.value = "";
+  registerPassword.value = "";
+});
+
+registerUsername.addEventListener("input", () => {
+  clearSignInError();
+});
+
+registerPassword.addEventListener("input", () => {
+  clearSignInError();
+});
+
 logOutBtn.addEventListener("click", () => {
   openSignInModal.style.display = "block";
   displayedName.innerText = "Guest";
   createTodoBtn.setAttribute("disabled", "true");
   localStorage.clear();
   logOutBtn.style.display = "none";
+  openRegisterModal.style.display = "block";
+  createTodoBtn.classList.toggle("border-danger");
   clearOutputArea();
 });
 
@@ -327,8 +433,6 @@ closeEditModal.addEventListener("click", async (e) => {
   console.log("user_id is: ", user_id);
   editModalBody.innerHTML = "";
   await getTodos(user_id);
-
-  // todoOutputArea.innerHTML = "";
 });
 
 saveChanges.addEventListener("click", async (e) => {
@@ -354,6 +458,7 @@ confirmDelete.addEventListener("click", async (e) => {
 });
 
 createTodoBtn.addEventListener("click", async (e) => {
+  e.preventDefault();
   try {
     if (!localStorage.getItem("token")) return;
     const title = createTodoTitle.value;
@@ -365,7 +470,7 @@ createTodoBtn.addEventListener("click", async (e) => {
       return;
     }
     console.log(title, due_date, user_id);
-    const result = await createTodo(title, due_date, user_id);
+    await createTodo(title, due_date, user_id);
     await getTodos(user_id);
     createTodoTitle.value = "";
     createTodoDate.value = "";
