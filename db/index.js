@@ -6,17 +6,21 @@ const client = new Client(DB_URL);
 
 // Seeding the database ==========
 const db_createUser = async ({ username, password }) => {
-  "";
   try {
-    await client.query(
+    const {
+      rows: [row],
+    } = await client.query(
       `
             INSERT INTO users(username, password)
             VALUES ($1, $2)
+            RETURNING *
             `,
       [username, password]
     );
+    console.log("rows are: ", row);
+    return row;
   } catch (err) {
-    console.log("error in db_createCustomer: ", err);
+    console.log("error in db_createUser: ", err);
   }
 };
 

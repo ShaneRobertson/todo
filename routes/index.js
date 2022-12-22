@@ -6,7 +6,7 @@ const {
   db_deleteTodo,
   db_updateTodo,
   db_getUser,
-
+  db_createUser,
   db_createTodo,
 } = require("../db/index");
 
@@ -46,6 +46,30 @@ apiRouter.post("/login", async (req, res) => {
     });
   } catch (error) {
     console.log("/login in routes: ", error.message);
+  }
+});
+
+apiRouter.post("/register", async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const response = await db_createUser({ username, password });
+    console.log("🤑🤑", response);
+    if (!response)
+      res.send({
+        message: "That username is not available! Please use a different one.",
+      });
+    let verifiedUser = {};
+    for (const key in response) {
+      if (key != "password") {
+        verifiedUser[key] = response[key];
+      }
+    }
+    jwt.sign({ verifiedUser }, process.env.jwt_Secret, (err, token) => {
+      if (err) res.send({ err, status: 403 });
+      res.send({ verifiedUser, token });
+    });
+  } catch (error) {
+    console.log("register user route error: ", error);
   }
 });
 
