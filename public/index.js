@@ -30,6 +30,7 @@ const logOutBtn = document.getElementById("nav-logout-btn");
 const todoOutputArea = document.getElementById("todo-output-area");
 const tableContainer = document.querySelector("table");
 const displayedName = document.getElementById("nav-displayed-username");
+const preloadWrapper = document.querySelector(".spinner-wrapper");
 
 // ---- Edit Modal ----
 const openEditModal = document.getElementById("edit-modal-icon");
@@ -271,9 +272,17 @@ const getTodoTitle = (id) => {
 
 // Event Listeners ====================================
 
+window.addEventListener("load", () => {
+  preloadWrapper.classList.add("fade-out-animation");
+});
+todoOutputArea.addEventListener("load", () => {
+  preloadWrapper.classList.add("fade-out-animation");
+});
+
 openSignInModal.addEventListener("click", () => {
   signInModalOverlay.style.display = "block";
   signinUsername.focus();
+  preloadWrapper.classList.remove("fade-out-animation");
 });
 
 closeSignInModal.addEventListener("click", () => {
@@ -285,6 +294,7 @@ closeSignInModal.addEventListener("click", () => {
 
 signinBtn.addEventListener("click", async (e) => {
   e.preventDefault();
+
   const username = signinUsername.value;
   const password = signinPassword.value;
   if (!username || !password) return;
@@ -301,10 +311,12 @@ signinBtn.addEventListener("click", async (e) => {
       signinPassword.value = "";
       return;
     }
+
     const { token, verifiedUser } = userObj;
     setLocalStorage(token, verifiedUser);
     createTodoBtn.removeAttribute("disabled");
     displayedName.innerText = verifiedUser.username;
+    preloadWrapper.classList.add("fade-out-animation");
     await getTodos(verifiedUser.user_id);
     signInModalOverlay.style.display = "none";
     openSignInModal.style.display = "none";
@@ -330,6 +342,7 @@ signinPassword.addEventListener("input", () => {
 // -- Register User
 openRegisterModal.addEventListener("click", () => {
   registerModalOverlay.style.display = "block";
+  preloadWrapper.classList.remove("fade-out-animation");
 });
 
 closeRegisterModal.addEventListener("click", () => {
@@ -361,6 +374,7 @@ registerBtn.addEventListener("click", async (e) => {
     setLocalStorage(token, verifiedUser);
     createTodoBtn.removeAttribute("disabled");
     displayedName.innerText = verifiedUser.username;
+    preloadWrapper.classList.add("fade-out-animation");
     await getTodos(verifiedUser.user_id);
     registerModalOverlay.style.display = "none";
     openRegisterModal.style.display = "none";

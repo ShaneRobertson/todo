@@ -212,3 +212,21 @@ th {
 #delete-modal-icon {
   margin-left: 0.5rem;
 }
+
+.spinner-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s ease;
+}
+
+.fade-out-animation {
+  opacity: 0;
+  visibility: hidden;
+}
